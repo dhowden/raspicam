@@ -2,12 +2,13 @@
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
-// Package raspicam provides basic Go APIs for interating with the Raspberry Pi
-// camera untilities.
+// Package raspicam provides basic Go APIs for interacting with the Raspberry Pi
+// camera.
 //
-// Currently this is done by calling the existing raspicam command and
-// capturing the output from stdout/stderr.  Eventually we would like
+// Currently this is done by calling the existing raspicam commands and
+// capturing output from stdout/stderr.  Eventually we would like
 // to call the C APIs directly.
+
 package raspicam
 
 import (
@@ -270,6 +271,7 @@ func (c *Camera) String() string {
 	return strings.TrimSpace(output)
 }
 
+// Rect represents a rectangle defined by integer parameters
 type Rect struct {
 	X, Y, Width, Height uint32
 }
