@@ -103,6 +103,13 @@ func (s *Still) params() []string {
 	return strings.Fields(s.String())
 }
 
+// NewStill returns a *Still with the default values set by the raspistill command
+// (see userland/linux/apps/raspicam/RaspiStill.c)
+func NewStill() *Still {
+	newStill := defaultStill
+	return &newStill
+}
+
 // StillYUV represents the configuration necessary to call raspistillYUV
 type StillYUV struct {
 	BaseStill
@@ -129,13 +136,6 @@ func (s *StillYUV) cmd() string {
 // params returns the parameters to be used in the command execution
 func (s *StillYUV) params() []string {
 	return strings.Fields(s.String())
-}
-
-// NewStill returns a *Still with the default values set by the raspistill command
-// (see userland/linux/apps/raspicam/RaspiStill.c)
-func NewStill() *Still {
-	newStill := defaultStill
-	return &newStill
 }
 
 // NewStill returns a *StillYUV with the default values set by the raspistillYUV command
