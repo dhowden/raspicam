@@ -27,7 +27,7 @@ type Vid struct {
 	Preview        Preview
 }
 
-// The default Vid settings
+// The default Vid setup
 // TODO: Framerate is set via a macro, should really call raspivid to get default
 var defaultVid = Vid{Timeout: 5000, Width: 1920, Height: 1080, Bitrate: 17000000,
 	Framerate: 30, ImmutableInput: true, Camera: defaultCamera, Preview: defaultPreview}

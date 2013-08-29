@@ -5,10 +5,9 @@
 // Package raspicam provides basic Go APIs for interacting with the Raspberry Pi
 // camera.
 //
-// Currently this is done by calling the existing raspicam commands and
-// capturing output from stdout/stderr.  Eventually we would like
-// to call the C APIs directly.
-
+// This is currently achieved by calling the existing raspicam commands and
+// capturing output from stdout/stderr.  In some future version we plan to call
+// the the C APIs directly.
 package raspicam
 
 import (
@@ -170,6 +169,7 @@ type ColourFX struct {
 	U, V    int
 }
 
+// String returns the command parameter for the given ColourFX
 func (c ColourFX) String() string {
 	return fmt.Sprintf("%v:%v", c.U, c.V)
 }
@@ -185,6 +185,7 @@ func (r *FloatRect) String() string {
 	return fmt.Sprintf("%v, %v, %v, %v", r.X, r.Y, r.W, r.H)
 }
 
+// The default RegionOfInterest setup
 var defaultRegionOfInterest = FloatRect{W: 1.0, H: 1.0}
 
 // Camera represents a camera configuration
@@ -206,6 +207,7 @@ type Camera struct {
 	RegionOfInterest     FloatRect // Assumes Normalised to [0.0,1.0]
 }
 
+// The default Camera setup
 var defaultCamera = Camera{Brightness: 50, ISO: 400, ExposureMode: ExposureAuto,
 	MeteringMode: MeteringAverage, AWBMode: AWBAuto, ImageEffect: FXNone,
 	ColourEffects: ColourFX{U: 128, V: 128}, RegionOfInterest: defaultRegionOfInterest}
@@ -273,6 +275,7 @@ type Rect struct {
 	X, Y, Width, Height uint32
 }
 
+// String returns the parameter string for the given Rect
 func (r *Rect) String() string {
 	return fmt.Sprintf("%v, %v, %v, %v", r.X, r.Y, r.Width, r.Height)
 }
@@ -302,6 +305,7 @@ type Preview struct {
 	Rect    Rect // Used when Mode is PreviewWindow
 }
 
+// The default Preview setup
 var defaultPreview = Preview{Mode: PreviewFullscreen, Opacity: 255,
 	Rect: Rect{X: 0, Y: 0, Width: 1024, Height: 768}}
 
@@ -327,9 +331,9 @@ type CaptureCommand interface {
 	params() []string
 }
 
-// Capture takes a configure and writes the result to the given writer. Any
-// errors are sent back on the given error channel, which is closed before
-// the function returns
+// Capture runs the given CaptureCommand and writes the result to the given
+// writer. Any errors are sent back on the given error channel, which is closed
+// before the function returns
 func Capture(c CaptureCommand, w io.Writer, errCh chan<- error) {
 	done := make(chan struct{})
 	defer func() {

@@ -12,7 +12,7 @@ import (
 const raspiStillCommand = "raspistill"
 const raspiStillYUVCommand = "raspiyuv"
 
-// Encoding represents an enumeration of the suported encoding types
+// Encoding represents an enumeration of the supported encoding types
 type Encoding uint
 
 const (
@@ -35,8 +35,8 @@ func (s Encoding) String() string {
 }
 
 // BaseStill represents the common elements between a Still and StillYUV
-// as described in their respective equivalents found in RaspiStill.c and
-// RaspiStillYUV.c respectively.
+// as described in their equivalents found in RaspiStill.c and RaspiStillYUV.c
+// respectively.
 type BaseStill struct {
 	Timeout       int // Delay (milliseconds) before image is taken
 	Width, Height int // Image dimensions
@@ -45,11 +45,11 @@ type BaseStill struct {
 	Preview       Preview
 }
 
-// The default BaseStill settings
+// The default BaseStill setup
 var defaultBaseStill = BaseStill{Timeout: 5000, Width: 2592, Height: 1944,
 	Camera: defaultCamera, Preview: defaultPreview}
 
-// String returns the parameter string for the given Still struct
+// String returns the parameter string for the given BaseStill
 func (s *BaseStill) String() string {
 	output := "--output -"
 	if s.Timeout != defaultStill.Timeout {
@@ -66,7 +66,7 @@ func (s *BaseStill) String() string {
 	return strings.TrimSpace(output)
 }
 
-// The default still settings
+// The default Still setup
 var defaultStill = Still{BaseStill: defaultBaseStill, Quality: 85,
 	Encoding: EncodingJPEG}
 
@@ -109,7 +109,7 @@ type StillYUV struct {
 	UseRGB bool // Output RGB data rather than YUV
 }
 
-// The default stillYUV settings
+// The default StillYUV setup
 var defaultStillYUV = StillYUV{BaseStill: defaultBaseStill}
 
 // String returns the parameter string for the given StillYUV struct
