@@ -138,7 +138,7 @@ func (s *StillYUV) params() []string {
 	return strings.Fields(s.String())
 }
 
-// NewStill returns a *StillYUV with the default values set by the raspistillYUV command
+// NewStill returns a *StillYUV with the default values set by the raspiyuv command
 // (see userland/linux/apps/raspicam/RaspiStillYUV.c)
 func NewStillYUV() *StillYUV {
 	newStillYUV := defaultStillYUV
