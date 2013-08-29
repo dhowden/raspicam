@@ -210,12 +210,6 @@ var defaultCamera = Camera{Brightness: 50, ISO: 400, ExposureMode: ExposureAuto,
 	MeteringMode: MeteringAverage, AWBMode: AWBAuto, ImageEffect: FXNone,
 	ColourEffects: ColourFX{U: 128, V: 128}, RegionOfInterest: defaultRegionOfInterest}
 
-// NewCamera constructs a default instance of the Camera struct based on
-// `raspicamcontrol_set_defaults` in RaspiCamControl.c
-func NewCamera() Camera {
-	return defaultCamera
-}
-
 // String returns the parameters necessary to construct the
 // equivalent command line arguments for the raspicam tools
 func (c *Camera) String() string {
