@@ -130,11 +130,11 @@ const (
 	FXFilm
 	FXBlur
 	FXSaturation
-	FXColourswap
-	FXWashedout
+	FXColourSwap
+	FXWashedOut
 	FXPosterise
-	FXColourpoint
-	FXColourbalance
+	FXColourPoint
+	FXColourBalance
 	FXCartoon
 )
 
