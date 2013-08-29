@@ -10,13 +10,13 @@ We aim to create an idiomatic Go API whilst mirroring the functionality of the e
 
 Implemented:
 
-- Interface to raspistill (and all options)
+- Interface to raspistill
+- Interface to raspiyuv
+- Interface to raspivid
 
 Todo:
 
-- Tests!
-- Interface to raspivid (in progress)
-- Interface to raspistillYUV (in progress)
+- More tests!
 
 ## Installation
 
@@ -52,7 +52,7 @@ Todo:
 			}
 		}()
 		log.Println("Capturing image...")
-		s.Capture(f, errCh)
+		raspicam.Capture(s, f, errCh)
 	}
 
 
@@ -93,7 +93,7 @@ Todo:
 				}
 				}()
 				log.Println("Capturing image...")
-				s.Capture(conn, errCh)
+				raspicam.Capture(s, conn, errCh)
 				log.Println("Done")
 				conn.Close()
 			}()
