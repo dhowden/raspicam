@@ -12,7 +12,10 @@
 package raspicam
 
 import (
+	"bufio"
 	"fmt"
+	"io"
+	"os/exec"
 	"strings"
 )
 
@@ -276,19 +279,23 @@ type Rect struct {
 	X, Y, Width, Height uint32
 }
 
+func (r *Rect) String() string {
+	return fmt.Sprintf("%v, %v, %v, %v", r.X, r.Y, r.Width, r.Height)
+}
+
 // PreviewMode represents an enumeration of preview modes
 type PreviewMode int
 
 const (
-	PreviewDisabled PreviewMode = iota
-	PreviewEnabled              // Preview enabled
-	PreviewFullscreen
+	PreviewFullscreen PreviewMode = iota // Enabled by default
+	PreviewWindow
+	PreviewDisabled
 )
 
 var previewModes = [...]string{
-	"--nopreview",
-	"--preview",
-	"--fullscreen",
+	"fullscreen",
+	"preview",
+	"nopreview",
 }
 
 // String returns the parameter string for the given PreviewMode
@@ -297,8 +304,8 @@ func (p PreviewMode) String() string { return previewModes[p] }
 // Preview contains the settings for the camera previews
 type Preview struct {
 	Mode    PreviewMode
-	Opacity int  // Opacity of window - 0 = transparent, 255 = opaque
-	Rect    Rect // Used when Mode is PreviewEnabled
+	Opacity int  // Opacity of window (0 = transparent, 255 = opaque)
+	Rect    Rect // Used when Mode is PreviewWindow
 }
 
 var defaultPreview = Preview{Mode: PreviewFullscreen, Opacity: 255,
@@ -307,11 +314,72 @@ var defaultPreview = Preview{Mode: PreviewFullscreen, Opacity: 255,
 // String returns the parameter string for the given Preview
 func (p *Preview) String() string {
 	output := ""
-	if p.Mode != defaultPreview.Mode {
-		output += " " + p.String()
+	if p.Mode == PreviewWindow {
+		output += fmt.Sprintf(" --%v %v", p.String(), p.Rect.String())
+	} else {
+		if p.Mode != defaultPreview.Mode {
+			output += " --" + p.String()
+		}
 	}
 	if p.Opacity != defaultPreview.Opacity {
 		output += fmt.Sprintf(" --opacity %v", p.Opacity)
 	}
 	return strings.TrimSpace(output)
+}
+
+// CaptureCommand represents a prepared capure command
+type CaptureCommand interface {
+	cmd() string
+	params() []string
+}
+
+// Capture takes a configure and writes the result to the given writer. Any
+// errors are sent back on the given error channel, which is closed before
+// the function returns
+func Capture(c CaptureCommand, w io.Writer, errCh chan<- error) {
+	done := make(chan struct{})
+	defer func() {
+		<-done
+		close(errCh)
+	}()
+
+	cmd := exec.Command(c.cmd(), c.params()...)
+
+	stdout, err := cmd.StdoutPipe()
+	if err != nil {
+		errCh <- err
+		return
+	}
+
+	stderr, err := cmd.StderrPipe()
+	if err != nil {
+		errCh <- err
+		return
+	}
+
+	go func() {
+		errScanner := bufio.NewScanner(stderr)
+		for errScanner.Scan() {
+			errCh <- fmt.Errorf("%v: %v", raspiStillCommand, errScanner.Text())
+		}
+		if err := errScanner.Err(); err != nil {
+			errCh <- err
+		}
+		close(done)
+	}()
+
+	if err := cmd.Start(); err != nil {
+		errCh <- fmt.Errorf("starting: %v", err)
+		return
+	}
+	defer func() {
+		if err := cmd.Wait(); err != nil {
+			errCh <- fmt.Errorf("waiting: %v", err)
+		}
+	}()
+
+	_, err = io.Copy(w, stdout)
+	if err != nil {
+		errCh <- err
+	}
 }

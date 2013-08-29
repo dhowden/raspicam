@@ -5,14 +5,12 @@
 package raspicam
 
 import (
-	"bufio"
 	"fmt"
-	"io"
-	"os/exec"
 	"strings"
 )
 
 const raspiStillCommand = "raspistill"
+const raspiStillYUVCommand = "raspiyuv"
 
 // Encoding represents an enumeration of the suported encoding types
 type Encoding uint
@@ -36,24 +34,24 @@ func (s Encoding) String() string {
 	return encodings[s]
 }
 
-// The default still settings
-var defaultStill = Still{Timeout: 5000, Width: 2592, Height: 1944, Quality: 85,
-	Encoding: EncodingJPEG, Camera: NewCamera()}
-
-// Still represents the configuration necessary to capture a still image
-type Still struct {
-	Timeout       int  // Delay (milliseconds) before image is taken
-	Width, Height int  // Image dimensions
-	Quality       int  // Quality (for lossy encoding)
-	Raw           bool // Want a raw image?
-	Timelapse     int  // The number of pictures to take in the given timeout interval
-	Encoding      Encoding
+// BaseStill represents the common elements between a Still and StillYUV
+// as described in their respective equivalents found in RaspiStill.c and
+// RaspiStillYUV.c respectively.
+type BaseStill struct {
+	Timeout       int // Delay (milliseconds) before image is taken
+	Width, Height int // Image dimensions
+	Timelapse     int // The number of pictures to take in the given timeout interval
 	Camera        Camera
+	Preview       Preview
 }
 
+// The default BaseStill settings
+var defaultBaseStill = BaseStill{Timeout: 5000, Width: 2592, Height: 1944,
+	Camera: defaultCamera, Preview: defaultPreview}
+
 // String returns the parameter string for the given Still struct
-func (s *Still) String() string {
-	output := " --output -"
+func (s *BaseStill) String() string {
+	output := "--output -"
 	if s.Timeout != defaultStill.Timeout {
 		output += fmt.Sprintf(" --timeout %v", s.Timeout)
 	}
@@ -63,73 +61,86 @@ func (s *Still) String() string {
 	if s.Height != defaultStill.Height {
 		output += fmt.Sprintf(" --height %v", s.Height)
 	}
+	output += " " + s.Camera.String()
+	output += " " + s.Preview.String()
+	return strings.TrimSpace(output)
+}
+
+// The default still settings
+var defaultStill = Still{BaseStill: defaultBaseStill, Quality: 85,
+	Encoding: EncodingJPEG}
+
+// Still represents the configuration necessary to call raspistill
+type Still struct {
+	BaseStill
+	Quality  int  // Quality (for lossy encoding)
+	Raw      bool // Want a raw image?
+	Encoding Encoding
+}
+
+// String returns the parameter string for the given Still struct
+func (s *Still) String() string {
+	output := s.BaseStill.String()
 	if s.Quality != defaultStill.Quality {
 		output += fmt.Sprintf(" --quality %v", s.Quality)
 	}
-	if s.Raw != defaultStill.Raw {
+	if s.Raw {
 		output += " --raw"
 	}
 	if s.Encoding != defaultStill.Encoding {
 		output += fmt.Sprintf(" --encoding %v", s.Encoding)
 	}
-	output += s.Camera.String()
 	return strings.TrimSpace(output)
 }
 
+// cmd returns the raspicam command associated with this struct
+func (s *Still) cmd() string {
+	return raspiStillCommand
+}
+
+// params returns the parameters to be used in the command execution
+func (s *Still) params() []string {
+	return strings.Fields(s.String())
+}
+
+// StillYUV represents the configuration necessary to call raspistillYUV
+type StillYUV struct {
+	BaseStill
+	UseRGB bool // Output RGB data rather than YUV
+}
+
+// The default stillYUV settings
+var defaultStillYUV = StillYUV{BaseStill: defaultBaseStill}
+
+// String returns the parameter string for the given StillYUV struct
+func (s *StillYUV) String() string {
+	output := s.BaseStill.String()
+	if s.UseRGB {
+		output += " --rgb"
+	}
+	return strings.TrimSpace(output)
+}
+
+// cmd returns the raspicam command associated with this struct
+func (s *StillYUV) cmd() string {
+	return raspiStillYUVCommand
+}
+
+// params returns the parameters to be used in the command execution
+func (s *StillYUV) params() []string {
+	return strings.Fields(s.String())
+}
+
 // NewStill returns a *Still with the default values set by the raspistill command
-// (see  userland/linux/apps/raspicam/RaspiStill.c)
+// (see userland/linux/apps/raspicam/RaspiStill.c)
 func NewStill() *Still {
 	newStill := defaultStill
 	return &newStill
 }
 
-// Capture takes a still and writes the result to the given writer. Any
-// errors are sent back on the given error channel, which is closed before
-// the function returns
-func (s *Still) Capture(w io.Writer, errCh chan<- error) {
-	done := make(chan struct{})
-	defer func() {
-		<-done
-		close(errCh)
-	}()
-
-	cmd := exec.Command(raspiStillCommand, strings.Fields(s.String())...)
-
-	stdout, err := cmd.StdoutPipe()
-	if err != nil {
-		errCh <- err
-		return
-	}
-
-	stderr, err := cmd.StderrPipe()
-	if err != nil {
-		errCh <- err
-		return
-	}
-
-	go func() {
-		errScanner := bufio.NewScanner(stderr)
-		for errScanner.Scan() {
-			errCh <- fmt.Errorf("%v: %v", raspiStillCommand, errScanner.Text())
-		}
-		if err := errScanner.Err(); err != nil {
-			errCh <- err
-		}
-		close(done)
-	}()
-
-	if err := cmd.Start(); err != nil {
-		errCh <- fmt.Errorf("starting: %v", err)
-		return
-	}
-	defer func() {
-		if err := cmd.Wait(); err != nil {
-			errCh <- fmt.Errorf("waiting: %v", err)
-		}
-	}()
-
-	_, err = io.Copy(w, stdout)
-	if err != nil {
-		errCh <- err
-	}
+// NewStill returns a *StillYUV with the default values set by the raspistillYUV command
+// (see userland/linux/apps/raspicam/RaspiStillYUV.c)
+func NewStillYUV() *StillYUV {
+	newStillYUV := defaultStillYUV
+	return &newStillYUV
 }
