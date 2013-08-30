@@ -7,6 +7,7 @@ package raspicam
 import (
 	"strings"
 	"testing"
+	"time"
 )
 
 func TestDefaultParams(t *testing.T) {
@@ -24,22 +25,22 @@ func TestDefaultParams(t *testing.T) {
 }
 
 func TestBasicParams(t *testing.T) {
-	const paramsOut = "--output - --timeout 10 --width 100 --height 1000"
+	const paramsOut = "--output - --timeout 10000 --width 100 --height 1000"
 
 	testNames := [...]string{"Still", "StillYUV", "Vid"}
 
 	still := NewStill()
-	still.Timeout = 10
+	still.Timeout = 10 * time.Second
 	still.Width = 100
 	still.Height = 1000
 
 	stillYUV := NewStillYUV()
-	stillYUV.Timeout = 10
+	stillYUV.Timeout = 10 * time.Second
 	stillYUV.Width = 100
 	stillYUV.Height = 1000
 
 	vid := NewVid()
-	vid.Timeout = 10
+	vid.Timeout = 10 * time.Second
 	vid.Width = 100
 	vid.Height = 1000
 
@@ -54,24 +55,24 @@ func TestBasicParams(t *testing.T) {
 }
 
 func TestCameraParams(t *testing.T) {
-	const paramsOut = "--output - --timeout 10 --sharpness 11 --contrast 13 --brightness 12"
+	const paramsOut = "--output - --timeout 10000 --sharpness 11 --contrast 13 --brightness 12"
 
 	testNames := [...]string{"Still", "StillYUV", "Vid"}
 
 	still := NewStill()
-	still.Timeout = 10
+	still.Timeout = 10 * time.Second
 	still.Camera.Sharpness = 11
 	still.Camera.Brightness = 12
 	still.Camera.Contrast = 13
 
 	stillYUV := NewStillYUV()
-	stillYUV.Timeout = 10
+	stillYUV.Timeout = 10 * time.Second
 	stillYUV.Camera.Sharpness = 11
 	stillYUV.Camera.Brightness = 12
 	stillYUV.Camera.Contrast = 13
 
 	vid := NewVid()
-	vid.Timeout = 10
+	vid.Timeout = 10 * time.Second
 	vid.Camera.Sharpness = 11
 	vid.Camera.Brightness = 12
 	vid.Camera.Contrast = 13

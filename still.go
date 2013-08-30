@@ -7,6 +7,7 @@ package raspicam
 import (
 	"fmt"
 	"strings"
+	"time"
 )
 
 const raspiStillCommand = "raspistill"
@@ -38,22 +39,22 @@ func (s Encoding) String() string {
 // as described in their equivalents found in RaspiStill.c and RaspiStillYUV.c
 // respectively.
 type BaseStill struct {
-	Timeout       int // Delay (milliseconds) before image is taken
-	Width, Height int // Image dimensions
-	Timelapse     int // The number of pictures to take in the given timeout interval
+	Timeout       time.Duration // Delay before image is taken
+	Width, Height int           // Image dimensions
+	Timelapse     int           // The number of pictures to take in the given timeout interval
 	Camera        Camera
 	Preview       Preview
 }
 
 // The default BaseStill setup
-var defaultBaseStill = BaseStill{Timeout: 5000, Width: 2592, Height: 1944,
+var defaultBaseStill = BaseStill{Timeout: 5 * time.Second, Width: 2592, Height: 1944,
 	Camera: defaultCamera, Preview: defaultPreview}
 
 // String returns the parameter string for the given BaseStill
 func (s *BaseStill) String() string {
 	output := "--output -"
 	if s.Timeout != defaultStill.Timeout {
-		output += fmt.Sprintf(" --timeout %v", s.Timeout)
+		output += fmt.Sprintf(" --timeout %v", int64(s.Timeout/time.Millisecond))
 	}
 	if s.Width != defaultStill.Width {
 		output += fmt.Sprintf(" --width %v", s.Width)
