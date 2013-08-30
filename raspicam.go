@@ -327,8 +327,8 @@ func (p *Preview) String() string {
 
 // CaptureCommand represents a prepared capure command
 type CaptureCommand interface {
-	cmd() string
-	params() []string
+	Cmd() string
+	Params() []string
 }
 
 // Capture runs the given CaptureCommand and writes the result to the given
@@ -341,7 +341,7 @@ func Capture(c CaptureCommand, w io.Writer, errCh chan<- error) {
 		close(errCh)
 	}()
 
-	cmd := exec.Command(c.cmd(), c.params()...)
+	cmd := exec.Command(c.Cmd(), c.Params()...)
 
 	stdout, err := cmd.StdoutPipe()
 	if err != nil {

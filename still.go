@@ -94,13 +94,13 @@ func (s *Still) String() string {
 	return strings.TrimSpace(output)
 }
 
-// cmd returns the raspicam command associated with this struct
-func (s *Still) cmd() string {
+// Cmd returns the raspicam command for a Still
+func (s *Still) Cmd() string {
 	return raspiStillCommand
 }
 
-// params returns the parameters to be used in the command execution
-func (s *Still) params() []string {
+// Params returns the parameters to be used in the command execution
+func (s *Still) Params() []string {
 	return strings.Fields(s.String())
 }
 
@@ -129,13 +129,13 @@ func (s *StillYUV) String() string {
 	return strings.TrimSpace(output)
 }
 
-// cmd returns the raspicam command associated with this struct
-func (s *StillYUV) cmd() string {
+// Cmd returns the raspicam command for a StillYUV
+func (s *StillYUV) Cmd() string {
 	return raspiStillYUVCommand
 }
 
-// params returns the parameters to be used in the command execution
-func (s *StillYUV) params() []string {
+// Params returns the parameters to be used in the command execution
+func (s *StillYUV) Params() []string {
 	return strings.Fields(s.String())
 }
 

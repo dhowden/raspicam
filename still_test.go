@@ -17,7 +17,7 @@ func TestDefaultParams(t *testing.T) {
 	testCases := [...]CaptureCommand{NewStill(), NewStillYUV(), NewVid()}
 
 	for i, test := range testNames {
-		paramString := strings.Join(testCases[i].params(), " ")
+		paramString := strings.Join(testCases[i].Params(), " ")
 		if paramString != paramsOut {
 			t.Errorf("%v: param() returned %v, expected %v", test, paramString, paramsOut)
 		}
@@ -47,7 +47,7 @@ func TestBasicParams(t *testing.T) {
 	testCases := [...]CaptureCommand{still, stillYUV, vid}
 
 	for i, test := range testNames {
-		paramString := strings.Join(testCases[i].params(), " ")
+		paramString := strings.Join(testCases[i].Params(), " ")
 		if paramString != paramsOut {
 			t.Errorf("%v: param() returned %v, expected %v", test, paramString, paramsOut)
 		}
@@ -80,7 +80,7 @@ func TestCameraParams(t *testing.T) {
 	testCases := [...]CaptureCommand{still, stillYUV, vid}
 
 	for i, test := range testNames {
-		paramString := strings.Join(testCases[i].params(), " ")
+		paramString := strings.Join(testCases[i].Params(), " ")
 		if paramString != paramsOut {
 			t.Errorf("%v: param() returned %v, expected %v", test, paramString, paramsOut)
 		}

@@ -59,13 +59,13 @@ func (v *Vid) String() string {
 	return strings.TrimSpace(output)
 }
 
-// cmd returns the raspicam command associated with this struct
-func (v *Vid) cmd() string {
+// Cmd returns the raspicam command for a Vid
+func (v *Vid) Cmd() string {
 	return raspiVidCommmand
 }
 
-// params returns the parameters to be used in the command execution
-func (v *Vid) params() []string {
+// Params returns the parameters to be used in the command execution
+func (v *Vid) Params() []string {
 	return strings.Fields(v.String())
 }
 
