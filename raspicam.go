@@ -325,7 +325,7 @@ func (p *Preview) String() string {
 	return strings.TrimSpace(output)
 }
 
-// CaptureCommand represents a prepared capure command
+// CaptureCommand represents a prepared capture command
 type CaptureCommand interface {
 	Cmd() string
 	Params() []string

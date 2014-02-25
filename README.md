@@ -39,7 +39,7 @@ Todo:
 	func main() {
 		f, err := os.Create(os.Args[1])
 		if err != nil {
-			fmt.Fprintf(os.Stderr, "listen: %v", err)
+			fmt.Fprintf(os.Stderr, "create file: %v", err)
 			return
 		}
 		defer f.Close()
