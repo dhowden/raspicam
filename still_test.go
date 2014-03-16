@@ -19,7 +19,7 @@ func TestDefaultParams(t *testing.T) {
 	for i, test := range testNames {
 		paramString := strings.Join(testCases[i].Params(), " ")
 		if paramString != paramsOut {
-			t.Errorf("%v: param() returned %v, expected %v", test, paramString, paramsOut)
+			t.Errorf("%v: Param() returned %v, expected %v", test, paramString, paramsOut)
 		}
 	}
 }
@@ -49,7 +49,7 @@ func TestBasicParams(t *testing.T) {
 	for i, test := range testNames {
 		paramString := strings.Join(testCases[i].Params(), " ")
 		if paramString != paramsOut {
-			t.Errorf("%v: param() returned %v, expected %v", test, paramString, paramsOut)
+			t.Errorf("%v: Param() returned %v, expected %v", test, paramString, paramsOut)
 		}
 	}
 }
@@ -82,7 +82,7 @@ func TestCameraParams(t *testing.T) {
 	for i, test := range testNames {
 		paramString := strings.Join(testCases[i].Params(), " ")
 		if paramString != paramsOut {
-			t.Errorf("%v: param() returned %v, expected %v", test, paramString, paramsOut)
+			t.Errorf("%v: Param() returned %v, expected %v", test, paramString, paramsOut)
 		}
 	}
 }
