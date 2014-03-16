@@ -5,9 +5,9 @@
 // Package raspicam provides basic Go APIs for interacting with the Raspberry Pi
 // camera.
 //
-// This is currently achieved by calling the existing raspicam commands and
-// capturing output from stdout/stderr.  In some future version we plan to call
-// the the C APIs directly.
+// All captures are prepared by first creating a CaptureCommand (Still, StillYUV or
+// Vid structs via calls to the NewStill, NewStillYUV or NewVid functions respectively).
+// The Capture function can then be used to perform the capture.
 package raspicam
 
 import (
