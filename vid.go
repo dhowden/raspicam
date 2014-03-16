@@ -12,7 +12,7 @@ import (
 
 const raspiVidCommmand = "raspivid"
 
-// Vid represents the the configuration used to call raspivid
+// Vid represents the the configuration used to call raspivid.
 type Vid struct {
 	Timeout       time.Duration // Delay before image is taken
 	Width, Height int           // Image dimensions
@@ -28,12 +28,20 @@ type Vid struct {
 	Preview        Preview
 }
 
-// The default Vid setup
-// TODO: Framerate is set via a macro, should really call raspivid to get default
-var defaultVid = Vid{Timeout: 5 * time.Second, Width: 1920, Height: 1080, Bitrate: 17000000,
-	Framerate: 30, ImmutableInput: true, Camera: defaultCamera, Preview: defaultPreview}
+// The default Vid setup.
+// TODO: Framerate is set via a macro, should really call raspivid to get default.
+var defaultVid = Vid{
+	Timeout:        5 * time.Second,
+	Width:          1920,
+	Height:         1080,
+	Bitrate:        17000000,
+	Framerate:      30,
+	ImmutableInput: true,
+	Camera:         defaultCamera,
+	Preview:        defaultPreview,
+}
 
-// String returns the parameter string for the given Vid struct
+// String returns the parameter string for the given Vid struct.
 func (v *Vid) String() string {
 	output := "--output -"
 	if v.Timeout != defaultVid.Timeout {
@@ -59,17 +67,17 @@ func (v *Vid) String() string {
 	return strings.TrimSpace(output)
 }
 
-// Cmd returns the raspicam command for a Vid
+// Cmd returns the raspicam command for a Vid.
 func (v *Vid) Cmd() string {
 	return raspiVidCommmand
 }
 
-// Params returns the parameters to be used in the command execution
+// Params returns the parameters to be used in the command execution.
 func (v *Vid) Params() []string {
 	return strings.Fields(v.String())
 }
 
-// NewVid returns a new *Vid struct setup with the default configuration
+// NewVid returns a new *Vid struct setup with the default configuration.
 func NewVid() *Vid {
 	newVid := defaultVid
 	return &newVid

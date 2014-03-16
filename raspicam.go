@@ -18,7 +18,7 @@ import (
 	"strings"
 )
 
-// ExposureMode is an enumeration of supported exposure modes
+// ExposureMode is an enumeration of supported exposure modes.
 type ExposureMode uint
 
 const (
@@ -53,10 +53,10 @@ var exposureModes = [...]string{
 	"fireworks",
 }
 
-// String returns the command line parameter for the given ExposureMode
+// String returns the command line parameter for the given ExposureMode.
 func (e ExposureMode) String() string { return exposureModes[e] }
 
-// An MeteringMode specificies an exposure metering mode
+// A MeteringMode specificies an exposure metering mode.
 type MeteringMode uint
 
 const (
@@ -73,10 +73,10 @@ var exposureMeteringMode = [...]string{
 	"matrix",
 }
 
-// String returns the command line parameter for the given MeteringMode
+// String returns the command line parameter for the given MeteringMode.
 func (m MeteringMode) String() string { return exposureMeteringMode[m] }
 
-// An AWBMode is an enumeration of the auto white balance modes
+// An AWBMode is an enumeration of the auto white balance modes.
 type AWBMode uint
 
 const (
@@ -105,10 +105,10 @@ var awbModes = [...]string{
 	"horizon",
 }
 
-// String returns the command line parameter for the given AWBMode
+// String returns the command line parameter for the given AWBMode.
 func (a AWBMode) String() string { return awbModes[a] }
 
-// An ImageFX specifies an image effect for the camera
+// An ImageFX specifies an image effect for the camera.
 type ImageFX uint
 
 const (
@@ -160,16 +160,16 @@ var imageFXModes = [...]string{
 	"cartoon",
 }
 
-// String returns the command-line parameter for the given imageFX
+// String returns the command-line parameter for the given imageFX.
 func (i ImageFX) String() string { return imageFXModes[i] }
 
-// ColourFX represents colour effects parameters
+// ColourFX represents colour effects parameters.
 type ColourFX struct {
 	Enabled bool
 	U, V    int
 }
 
-// String returns the command parameter for the given ColourFX
+// String returns the command parameter for the given ColourFX.
 func (c ColourFX) String() string {
 	return fmt.Sprintf("%v:%v", c.U, c.V)
 }
@@ -180,15 +180,15 @@ type FloatRect struct {
 	X, Y, W, H float64
 }
 
-// String returns the command parameter for the given FloatRect
+// String returns the command parameter for the given FloatRect.
 func (r *FloatRect) String() string {
 	return fmt.Sprintf("%v, %v, %v, %v", r.X, r.Y, r.W, r.H)
 }
 
-// The default RegionOfInterest setup
+// The default RegionOfInterest setup.
 var defaultRegionOfInterest = FloatRect{W: 1.0, H: 1.0}
 
-// Camera represents a camera configuration
+// Camera represents a camera configuration.
 type Camera struct {
 	Sharpness            int // -100 to 100
 	Contrast             int // -100 to 100
@@ -207,13 +207,20 @@ type Camera struct {
 	RegionOfInterest     FloatRect // Assumes Normalised to [0.0,1.0]
 }
 
-// The default Camera setup
-var defaultCamera = Camera{Brightness: 50, ISO: 400, ExposureMode: ExposureAuto,
-	MeteringMode: MeteringAverage, AWBMode: AWBAuto, ImageEffect: FXNone,
-	ColourEffects: ColourFX{U: 128, V: 128}, RegionOfInterest: defaultRegionOfInterest}
+// The default Camera setup.
+var defaultCamera = Camera{
+	Brightness:       50,
+	ISO:              400,
+	ExposureMode:     ExposureAuto,
+	MeteringMode:     MeteringAverage,
+	AWBMode:          AWBAuto,
+	ImageEffect:      FXNone,
+	ColourEffects:    ColourFX{U: 128, V: 128},
+	RegionOfInterest: defaultRegionOfInterest,
+}
 
 // String returns the parameters necessary to construct the
-// equivalent command line arguments for the raspicam tools
+// equivalent command line arguments for the raspicam tools.
 func (c *Camera) String() string {
 	output := ""
 	if c.Sharpness != defaultCamera.Sharpness {
@@ -270,18 +277,18 @@ func (c *Camera) String() string {
 	return strings.TrimSpace(output)
 }
 
-// Rect represents a rectangle defined by integer parameters
+// Rect represents a rectangle defined by integer parameters.
 type Rect struct {
 	X, Y, Width, Height uint32
 }
 
-// String returns the parameter string for the given Rect
+// String returns the parameter string for the given Rect.
 func (r *Rect) String() string {
 	return fmt.Sprintf("%v, %v, %v, %v", r.X, r.Y, r.Width, r.Height)
 }
 
-// PreviewMode represents an enumeration of preview modes
 type PreviewMode int
+// PreviewMode represents an enumeration of preview modes.
 
 const (
 	PreviewFullscreen PreviewMode = iota // Enabled by default
@@ -295,21 +302,24 @@ var previewModes = [...]string{
 	"nopreview",
 }
 
-// String returns the parameter string for the given PreviewMode
+// String returns the parameter string for the given PreviewMode.
 func (p PreviewMode) String() string { return previewModes[p] }
 
-// Preview contains the settings for the camera previews
+// Preview contains the settings for the camera previews.
 type Preview struct {
 	Mode    PreviewMode
 	Opacity int  // Opacity of window (0 = transparent, 255 = opaque)
 	Rect    Rect // Used when Mode is PreviewWindow
 }
 
-// The default Preview setup
-var defaultPreview = Preview{Mode: PreviewFullscreen, Opacity: 255,
-	Rect: Rect{X: 0, Y: 0, Width: 1024, Height: 768}}
+// The default Preview setup.
+var defaultPreview = Preview{
+	Mode:    PreviewFullscreen,
+	Opacity: 255,
+	Rect:    Rect{X: 0, Y: 0, Width: 1024, Height: 768},
+}
 
-// String returns the parameter string for the given Preview
+// String returns the parameter string for the given Preview.
 func (p *Preview) String() string {
 	output := ""
 	if p.Mode == PreviewWindow {
@@ -325,7 +335,7 @@ func (p *Preview) String() string {
 	return strings.TrimSpace(output)
 }
 
-// CaptureCommand represents a prepared capture command
+// CaptureCommand represents a prepared capture command.
 type CaptureCommand interface {
 	Cmd() string
 	Params() []string
@@ -333,7 +343,7 @@ type CaptureCommand interface {
 
 // Capture runs the given CaptureCommand and writes the result to the given
 // writer. Any errors are sent back on the given error channel, which is closed
-// before the function returns
+// before the function returns.
 func Capture(c CaptureCommand, w io.Writer, errCh chan<- error) {
 	done := make(chan struct{})
 	defer func() {
@@ -358,7 +368,7 @@ func Capture(c CaptureCommand, w io.Writer, errCh chan<- error) {
 	go func() {
 		errScanner := bufio.NewScanner(stderr)
 		for errScanner.Scan() {
-			errCh <- fmt.Errorf("%v: %v", raspiStillCommand, errScanner.Text())
+			errCh <- fmt.Errorf("%v: %v", c.Cmd(), errScanner.Text())
 		}
 		if err := errScanner.Err(); err != nil {
 			errCh <- err

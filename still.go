@@ -13,7 +13,7 @@ import (
 const raspiStillCommand = "raspistill"
 const raspiStillYUVCommand = "raspiyuv"
 
-// Encoding represents an enumeration of the supported encoding types
+// Encoding represents an enumeration of the supported encoding types.
 type Encoding uint
 
 const (
@@ -30,7 +30,7 @@ var encodings = [...]string{
 	"png",
 }
 
-// String returns the parameter string for the given encoding
+// String returns the parameter string for the given encoding.
 func (s Encoding) String() string {
 	return encodings[s]
 }
@@ -46,11 +46,16 @@ type BaseStill struct {
 	Preview       Preview
 }
 
-// The default BaseStill setup
-var defaultBaseStill = BaseStill{Timeout: 5 * time.Second, Width: 2592, Height: 1944,
-	Camera: defaultCamera, Preview: defaultPreview}
+// The default BaseStill setup.
+var defaultBaseStill = BaseStill{
+	Timeout: 5 * time.Second,
+	Width:   2592,
+	Height:  1944,
+	Camera:  defaultCamera,
+	Preview: defaultPreview,
+}
 
-// String returns the parameter string for the given BaseStill
+// String returns the parameter string for the given BaseStill.
 func (s *BaseStill) String() string {
 	output := "--output -"
 	if s.Timeout != defaultStill.Timeout {
@@ -67,11 +72,14 @@ func (s *BaseStill) String() string {
 	return strings.TrimSpace(output)
 }
 
-// The default Still setup
-var defaultStill = Still{BaseStill: defaultBaseStill, Quality: 85,
-	Encoding: EncodingJPEG}
+// The default Still setup.
+var defaultStill = Still{
+	BaseStill: defaultBaseStill,
+	Quality:   85,
+	Encoding:  EncodingJPEG,
+}
 
-// Still represents the configuration necessary to call raspistill
+// Still represents the configuration necessary to call raspistill.
 type Still struct {
 	BaseStill
 	Quality  int  // Quality (for lossy encoding)
@@ -79,7 +87,7 @@ type Still struct {
 	Encoding Encoding
 }
 
-// String returns the parameter string for the given Still struct
+// String returns the parameter string for the given Still struct.
 func (s *Still) String() string {
 	output := s.BaseStill.String()
 	if s.Quality != defaultStill.Quality {
@@ -94,33 +102,35 @@ func (s *Still) String() string {
 	return strings.TrimSpace(output)
 }
 
-// Cmd returns the raspicam command for a Still
+// Cmd returns the raspicam command for a Still.
 func (s *Still) Cmd() string {
 	return raspiStillCommand
 }
 
-// Params returns the parameters to be used in the command execution
+// Params returns the parameters to be used in the command execution.
 func (s *Still) Params() []string {
 	return strings.Fields(s.String())
 }
 
 // NewStill returns a *Still with the default values set by the raspistill command
-// (see userland/linux/apps/raspicam/RaspiStill.c)
+// (see userland/linux/apps/raspicam/RaspiStill.c).
 func NewStill() *Still {
 	newStill := defaultStill
 	return &newStill
 }
 
-// StillYUV represents the configuration necessary to call raspistillYUV
+// StillYUV represents the configuration necessary to call raspistillYUV.
 type StillYUV struct {
 	BaseStill
 	UseRGB bool // Output RGB data rather than YUV
 }
 
-// The default StillYUV setup
-var defaultStillYUV = StillYUV{BaseStill: defaultBaseStill}
+// The default StillYUV setup.
+var defaultStillYUV = StillYUV{
+	BaseStill: defaultBaseStill,
+}
 
-// String returns the parameter string for the given StillYUV struct
+// String returns the parameter string for the given StillYUV struct.
 func (s *StillYUV) String() string {
 	output := s.BaseStill.String()
 	if s.UseRGB {
@@ -129,18 +139,18 @@ func (s *StillYUV) String() string {
 	return strings.TrimSpace(output)
 }
 
-// Cmd returns the raspicam command for a StillYUV
+// Cmd returns the raspicam command for a StillYUV.
 func (s *StillYUV) Cmd() string {
 	return raspiStillYUVCommand
 }
 
-// Params returns the parameters to be used in the command execution
+// Params returns the parameters to be used in the command execution.
 func (s *StillYUV) Params() []string {
 	return strings.Fields(s.String())
 }
 
-// NewStill returns a *StillYUV with the default values set by the raspiyuv command
-// (see userland/linux/apps/raspicam/RaspiStillYUV.c)
+// NewStillYUV returns a *StillYUV with the default values set by the raspiyuv command
+// (see userland/linux/apps/raspicam/RaspiStillYUV.c).
 func NewStillYUV() *StillYUV {
 	newStillYUV := defaultStillYUV
 	return &newStillYUV
