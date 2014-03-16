@@ -10,8 +10,11 @@ import (
 	"time"
 )
 
-const raspiStillCommand = "raspistill"
-const raspiStillYUVCommand = "raspiyuv"
+// DefaultRaspistillCommand is the default command for capturing stills.
+var DefaultRaspiStillCommand = "raspistill"
+
+// DefaultRaspiStillYUVCommand is the default command for capturing YUV stills.
+var DefaultRaspiStillYUVCommand = "raspiyuv"
 
 // Encoding represents an enumeration of the supported encoding types.
 type Encoding uint
@@ -44,6 +47,13 @@ type BaseStill struct {
 	Timelapse     int           // The number of pictures to take in the given timeout interval
 	Camera        Camera
 	Preview       Preview
+
+	// The command to run when making a still capture.  If left blank, the default
+	// command is used.
+	Command string
+
+	// Additional arguments.  Default is empty.
+	Args []string
 }
 
 // The default BaseStill setup.
@@ -104,12 +114,15 @@ func (s *Still) String() string {
 
 // Cmd returns the raspicam command for a Still.
 func (s *Still) Cmd() string {
-	return raspiStillCommand
+	if s.BaseStill.Command != "" {
+		return s.BaseStill.Command
+	}
+	return DefaultRaspiStillCommand
 }
 
 // Params returns the parameters to be used in the command execution.
 func (s *Still) Params() []string {
-	return strings.Fields(s.String())
+	return append(strings.Fields(s.String()), s.BaseStill.Args...)
 }
 
 // NewStill returns a *Still with the default values set by the raspistill command
@@ -141,12 +154,15 @@ func (s *StillYUV) String() string {
 
 // Cmd returns the raspicam command for a StillYUV.
 func (s *StillYUV) Cmd() string {
-	return raspiStillYUVCommand
+	if s.BaseStill.Command != "" {
+		return s.BaseStill.Command
+	}
+	return DefaultRaspiStillYUVCommand
 }
 
 // Params returns the parameters to be used in the command execution.
 func (s *StillYUV) Params() []string {
-	return strings.Fields(s.String())
+	return append(strings.Fields(s.String()), s.BaseStill.Args...)
 }
 
 // NewStillYUV returns a *StillYUV with the default values set by the raspiyuv command

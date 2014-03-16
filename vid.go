@@ -10,7 +10,8 @@ import (
 	"time"
 )
 
-const raspiVidCommmand = "raspivid"
+// DefaultRaspiVidCommmand is the default command for capturing video.
+var DefaultRaspiVidCommmand = "raspivid"
 
 // Vid represents the the configuration used to call raspivid.
 type Vid struct {
@@ -26,6 +27,13 @@ type Vid struct {
 	ImmutableInput bool
 	Camera         Camera
 	Preview        Preview
+
+	// The command to run when making a video capture.  If left blank, the default
+	// command is used.
+	Command string
+
+	// Additional arguments.  Default is empty.
+	Args []string
 }
 
 // The default Vid setup.
@@ -69,12 +77,15 @@ func (v *Vid) String() string {
 
 // Cmd returns the raspicam command for a Vid.
 func (v *Vid) Cmd() string {
-	return raspiVidCommmand
+	if v.Command != "" {
+		return v.Command
+	}
+	return DefaultRaspiVidCommmand
 }
 
 // Params returns the parameters to be used in the command execution.
 func (v *Vid) Params() []string {
-	return strings.Fields(v.String())
+	return append(strings.Fields(v.String()), v.Args...)
 }
 
 // NewVid returns a new *Vid struct setup with the default configuration.

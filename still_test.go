@@ -24,6 +24,34 @@ func TestDefaultParams(t *testing.T) {
 	}
 }
 
+func TestDefaultParamsOptionalArgs(t *testing.T) {
+	const paramsOut = "--output - arg1 arg2"
+
+	args := strings.Fields("arg1 arg2")
+
+	still := NewStill()
+	still.Command = "test"
+	still.Args = args
+
+	stillYUV := NewStillYUV()
+	stillYUV.BaseStill.Command = "test"
+	stillYUV.BaseStill.Args = args
+
+	vid := NewVid()
+	vid.Command = "test"
+	vid.Args = args
+
+	testNames := [...]string{"Still", "StillYUV", "Vid"}
+	testCases := [...]CaptureCommand{still, stillYUV, vid}
+
+	for i, test := range testNames {
+		paramString := strings.Join(testCases[i].Params(), " ")
+		if paramString != paramsOut {
+			t.Errorf("%v: Param() returned %v, expected %v", test, paramString, paramsOut)
+		}
+	}
+}
+
 func TestBasicParams(t *testing.T) {
 	const paramsOut = "--output - --timeout 10000 --width 100 --height 1000"
 
