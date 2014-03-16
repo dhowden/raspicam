@@ -287,8 +287,8 @@ func (r *Rect) String() string {
 	return fmt.Sprintf("%v, %v, %v, %v", r.X, r.Y, r.Width, r.Height)
 }
 
-type PreviewMode int
 // PreviewMode represents an enumeration of preview modes.
+type PreviewMode uint
 
 const (
 	PreviewFullscreen PreviewMode = iota // Enabled by default
