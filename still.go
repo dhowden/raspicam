@@ -42,6 +42,7 @@ func (s Encoding) String() string {
 // as described in their equivalents found in RaspiStill.c and RaspiStillYUV.c
 // respectively.
 type BaseStill struct {
+	CamSelect     int
 	Timeout       time.Duration // Delay before image is taken
 	Width, Height int           // Image dimensions
 	Timelapse     int           // The number of pictures to take in the given timeout interval
@@ -68,6 +69,9 @@ var defaultBaseStill = BaseStill{
 // String returns the parameter string for the given BaseStill.
 func (s *BaseStill) String() string {
 	output := "--output -"
+	if s.CamSelect != defaultStill.CamSelect {
+		output += fmt.Sprintf(" --camselect %d", s.CamSelect)
+	}
 	if s.Timeout != defaultStill.Timeout {
 		output += fmt.Sprintf(" --timeout %v", int64(s.Timeout/time.Millisecond))
 	}
