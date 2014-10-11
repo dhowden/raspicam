@@ -16,6 +16,7 @@ import (
 	"io"
 	"os/exec"
 	"strings"
+	"time"
 )
 
 // ExposureMode is an enumeration of supported exposure modes.
@@ -205,6 +206,7 @@ type Camera struct {
 	Rotation             int // 0 to 359
 	HFlip, VFlip         bool
 	RegionOfInterest     FloatRect // Assumes Normalised to [0.0,1.0]
+	ShutterSpeed         time.Duration
 }
 
 // The default Camera setup.
@@ -273,6 +275,9 @@ func (c *Camera) String() string {
 	}
 	if c.RegionOfInterest != defaultCamera.RegionOfInterest {
 		output += fmt.Sprintf(" --roi %v", c.RegionOfInterest)
+	}
+	if c.ShutterSpeed != defaultCamera.ShutterSpeed {
+		output += fmt.Sprintf(" --shutter %d", int64(c.ShutterSpeed/time.Microsecond))
 	}
 	return strings.TrimSpace(output)
 }
