@@ -1,4 +1,5 @@
 # raspicam Go API
+[![GoDoc](https://godoc.org/github.com/dhowden/raspicam?status.svg)](https://godoc.org/github.com/dhowden/raspicam)
 
 Provides a simple Go interface to the [Raspberry Pi Camera board](http://www.raspberrypi.org/archives/tag/camera-board).
 
