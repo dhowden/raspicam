@@ -5,8 +5,6 @@
 package raspicam
 
 import (
-	"fmt"
-	"strings"
 	"time"
 )
 
@@ -51,28 +49,33 @@ var defaultVid = Vid{
 
 // String returns the parameter string for the given Vid struct.
 func (v *Vid) String() string {
-	output := "--output -"
+	return paramString(v)
+}
+
+func (v *Vid) params() []string {
+	var out params
+	out.add("--output", "-")
 	if v.Timeout != defaultVid.Timeout {
-		output += fmt.Sprintf(" --timeout %v", int64(v.Timeout/time.Millisecond))
+		out.addInt64("--timeout", int64(v.Timeout/time.Millisecond))
 	}
 	if v.Width != defaultVid.Width {
-		output += fmt.Sprintf(" --width %v", v.Width)
+		out.addInt("--width", v.Width)
 	}
 	if v.Height != defaultVid.Height {
-		output += fmt.Sprintf(" --height %v", v.Height)
+		out.addInt("--height", v.Height)
 	}
 	if v.Bitrate != defaultVid.Bitrate {
-		output += fmt.Sprintf(" --bitrate %v", v.Bitrate)
+		out.addInt("--bitrate", v.Bitrate)
 	}
 	if v.Framerate != defaultVid.Framerate {
-		output += fmt.Sprintf(" --framerate %v", v.Framerate)
+		out.addInt("--framerate", v.Framerate)
 	}
 	if v.IntraPeriod != defaultVid.IntraPeriod {
-		output += fmt.Sprintf(" --intra %v", v.IntraPeriod)
+		out.addInt("--intra", v.IntraPeriod)
 	}
-	output += " " + v.Camera.String()
-	output += " " + v.Preview.String()
-	return strings.TrimSpace(output)
+	out.add(v.Camera.params()...)
+	out.add(v.Preview.params()...)
+	return out
 }
 
 // Cmd returns the raspicam command for a Vid.
@@ -85,7 +88,7 @@ func (v *Vid) Cmd() string {
 
 // Params returns the parameters to be used in the command execution.
 func (v *Vid) Params() []string {
-	return append(strings.Fields(v.String()), v.Args...)
+	return append(v.params(), v.Args...)
 }
 
 // NewVid returns a new *Vid struct setup with the default configuration.

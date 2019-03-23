@@ -15,6 +15,7 @@ import (
 	"fmt"
 	"io"
 	"os/exec"
+	"strconv"
 	"strings"
 	"time"
 )
@@ -224,62 +225,78 @@ var defaultCamera = Camera{
 // String returns the parameters necessary to construct the
 // equivalent command line arguments for the raspicam tools.
 func (c *Camera) String() string {
-	output := ""
+	return paramString(c)
+}
+
+// params is a wrapper around a string slice which adds convenience
+// methods for adding different types of parameters
+type params []string
+
+func (ps *params) add(xs ...string)           { *ps = append(*ps, xs...) }
+func (ps *params) addInt(x string, n int)     { *ps = append(*ps, x, strconv.Itoa(n)) }
+func (ps *params) addInt64(x string, n int64) { *ps = append(*ps, x, strconv.FormatInt(n, 10)) }
+
+func paramString(x interface{ params() []string }) string {
+	return strings.Join(x.params(), " ")
+}
+
+func (c *Camera) params() []string {
+	var out params
 	if c.Sharpness != defaultCamera.Sharpness {
-		output += fmt.Sprintf(" --sharpness %v", c.Sharpness)
+		out.addInt("--sharpness", c.Sharpness)
 	}
 	if c.Contrast != defaultCamera.Contrast {
-		output += fmt.Sprintf(" --contrast %v", c.Contrast)
+		out.addInt("--contrast", c.Contrast)
 	}
 	if c.Brightness != defaultCamera.Brightness {
-		output += fmt.Sprintf(" --brightness %v", c.Brightness)
+		out.addInt("--brightness", c.Brightness)
 	}
 	if c.Saturation != defaultCamera.Saturation {
-		output += fmt.Sprintf(" --saturation %v", c.Saturation)
+		out.addInt("--saturation", c.Saturation)
 	}
 	if c.ISO != defaultCamera.ISO {
-		output += fmt.Sprintf(" --ISO %v", c.ISO)
+		out.addInt("--ISO", c.ISO)
 	}
 	if c.VideoStabilisation {
-		output += " --vstab"
+		out.add("--vstab")
 	}
 	if c.ExposureCompensation != defaultCamera.ExposureCompensation {
-		output += fmt.Sprintf(" --ev %v", c.ExposureCompensation)
+		out.addInt("--ev", c.ExposureCompensation)
 	}
 	if c.ExposureMode != defaultCamera.ExposureMode {
-		output += fmt.Sprintf(" --exposure %v", c.ExposureMode)
+		out.add("--exposure", c.ExposureMode.String())
 	}
 	if c.MeteringMode != defaultCamera.MeteringMode {
-		output += fmt.Sprintf(" --metering %v", c.MeteringMode)
+		out.add("--metering", c.MeteringMode.String())
 	}
 	if c.AWBMode != defaultCamera.AWBMode {
-		output += fmt.Sprintf(" --awb %v", c.AWBMode)
+		out.add("--awb", c.AWBMode.String())
 	}
 	if c.ImageEffect != defaultCamera.ImageEffect {
-		output += fmt.Sprintf(" --imxfx %v", c.ImageEffect)
+		out.add("--imxfx", c.ImageEffect.String())
 	}
 	if c.ColourEffects.Enabled {
-		output += fmt.Sprintf(" --colfx %v", c.ColourEffects)
+		out.add("--colfx", c.ColourEffects.String())
 	}
 	if c.MeteringMode != defaultCamera.MeteringMode {
-		output += fmt.Sprintf(" --metering %v", c.MeteringMode)
+		out.add("--metering", c.MeteringMode.String())
 	}
 	if c.Rotation != defaultCamera.Rotation {
-		output += fmt.Sprintf(" --rotation %v", c.Rotation)
+		out.addInt("--rotation", c.Rotation)
 	}
 	if c.HFlip {
-		output += " --hflip"
+		out.add("--hflip")
 	}
 	if c.VFlip {
-		output += " --vflip"
+		out.add("--vflip")
 	}
 	if c.RegionOfInterest != defaultCamera.RegionOfInterest {
-		output += fmt.Sprintf(" --roi %v", c.RegionOfInterest)
+		out.add("--roi", c.RegionOfInterest.String())
 	}
 	if c.ShutterSpeed != defaultCamera.ShutterSpeed {
-		output += fmt.Sprintf(" --shutter %d", int64(c.ShutterSpeed/time.Microsecond))
+		out.addInt64("--shutter", int64(c.ShutterSpeed/time.Microsecond))
 	}
-	return strings.TrimSpace(output)
+	return out
 }
 
 // Rect represents a rectangle defined by integer parameters.
@@ -326,18 +343,22 @@ var defaultPreview = Preview{
 
 // String returns the parameter string for the given Preview.
 func (p *Preview) String() string {
-	output := ""
+	return paramString(p)
+}
+
+func (p *Preview) params() []string {
+	var out params
 	if p.Mode == PreviewWindow {
-		output += fmt.Sprintf(" --%v %v", p.Mode.String(), p.Rect.String())
+		out.add("--"+p.Mode.String(), p.Rect.String())
 	} else {
 		if p.Mode != defaultPreview.Mode {
-			output += " --" + p.Mode.String()
+			out.add("--" + p.Mode.String())
 		}
 	}
 	if p.Opacity != defaultPreview.Opacity {
-		output += fmt.Sprintf(" --opacity %v", p.Opacity)
+		out.addInt("--opacity", p.Opacity)
 	}
-	return strings.TrimSpace(output)
+	return out
 }
 
 // CaptureCommand represents a prepared capture command.

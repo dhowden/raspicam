@@ -5,8 +5,6 @@
 package raspicam
 
 import (
-	"fmt"
-	"strings"
 	"time"
 )
 
@@ -68,22 +66,27 @@ var defaultBaseStill = BaseStill{
 
 // String returns the parameter string for the given BaseStill.
 func (s *BaseStill) String() string {
-	output := "--output -"
+	return paramString(s)
+}
+
+func (s *BaseStill) params() []string {
+	var out params
+	out.add("--output", "-")
 	if s.CamSelect != defaultStill.CamSelect {
-		output += fmt.Sprintf(" --camselect %d", s.CamSelect)
+		out.addInt("--camselect", s.CamSelect)
 	}
 	if s.Timeout != defaultStill.Timeout {
-		output += fmt.Sprintf(" --timeout %v", int64(s.Timeout/time.Millisecond))
+		out.addInt64("--timeout", int64(s.Timeout/time.Millisecond))
 	}
 	if s.Width != defaultStill.Width {
-		output += fmt.Sprintf(" --width %v", s.Width)
+		out.addInt("--width", s.Width)
 	}
 	if s.Height != defaultStill.Height {
-		output += fmt.Sprintf(" --height %v", s.Height)
+		out.addInt("--height", s.Height)
 	}
-	output += " " + s.Camera.String()
-	output += " " + s.Preview.String()
-	return strings.TrimSpace(output)
+	out.add(s.Camera.params()...)
+	out.add(s.Preview.params()...)
+	return out
 }
 
 // The default Still setup.
@@ -103,17 +106,21 @@ type Still struct {
 
 // String returns the parameter string for the given Still struct.
 func (s *Still) String() string {
-	output := s.BaseStill.String()
+	return paramString(s)
+}
+
+func (s *Still) params() []string {
+	out := params(s.BaseStill.params())
 	if s.Quality != defaultStill.Quality {
-		output += fmt.Sprintf(" --quality %v", s.Quality)
+		out.addInt("--quality", s.Quality)
 	}
 	if s.Raw {
-		output += " --raw"
+		out.add("--raw")
 	}
 	if s.Encoding != defaultStill.Encoding {
-		output += fmt.Sprintf(" --encoding %v", s.Encoding)
+		out.add("--encoding", s.Encoding.String())
 	}
-	return strings.TrimSpace(output)
+	return out
 }
 
 // Cmd returns the raspicam command for a Still.
@@ -126,7 +133,7 @@ func (s *Still) Cmd() string {
 
 // Params returns the parameters to be used in the command execution.
 func (s *Still) Params() []string {
-	return append(strings.Fields(s.String()), s.BaseStill.Args...)
+	return append(s.params(), s.BaseStill.Args...)
 }
 
 // NewStill returns a *Still with the default values set by the raspistill command
@@ -149,11 +156,15 @@ var defaultStillYUV = StillYUV{
 
 // String returns the parameter string for the given StillYUV struct.
 func (s *StillYUV) String() string {
-	output := s.BaseStill.String()
+	return paramString(s)
+}
+
+func (s *StillYUV) params() []string {
+	out := params(s.BaseStill.params())
 	if s.UseRGB {
-		output += " --rgb"
+		out.add("--rgb")
 	}
-	return strings.TrimSpace(output)
+	return out
 }
 
 // Cmd returns the raspicam command for a StillYUV.
@@ -166,7 +177,7 @@ func (s *StillYUV) Cmd() string {
 
 // Params returns the parameters to be used in the command execution.
 func (s *StillYUV) Params() []string {
-	return append(strings.Fields(s.String()), s.BaseStill.Args...)
+	return append(s.params(), s.BaseStill.Args...)
 }
 
 // NewStillYUV returns a *StillYUV with the default values set by the raspiyuv command
