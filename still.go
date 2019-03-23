@@ -10,7 +10,7 @@ import (
 	"time"
 )
 
-// DefaultRaspistillCommand is the default command for capturing stills.
+// DefaultRaspiStillCommand is the default command for capturing stills.
 var DefaultRaspiStillCommand = "raspistill"
 
 // DefaultRaspiStillYUVCommand is the default command for capturing YUV stills.
