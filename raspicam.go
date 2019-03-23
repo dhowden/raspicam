@@ -328,10 +328,10 @@ var defaultPreview = Preview{
 func (p *Preview) String() string {
 	output := ""
 	if p.Mode == PreviewWindow {
-		output += fmt.Sprintf(" --%v %v", p.String(), p.Rect.String())
+		output += fmt.Sprintf(" --%v %v", p.Mode.String(), p.Rect.String())
 	} else {
 		if p.Mode != defaultPreview.Mode {
-			output += " --" + p.String()
+			output += " --" + p.Mode.String()
 		}
 	}
 	if p.Opacity != defaultPreview.Opacity {
